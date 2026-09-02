@@ -49,3 +49,35 @@ export function extractUserTexts(nodes) {
 export function createHistoryStore() {
   return { history: [], navIndex: -1, savedDraft: null, pending: null, seeded: new Set() }
 }
+
+/**
+ * 从单个 user 节点的 data 提取预览文本。
+ * data 形如 { kind:'user', seq, time, content: ContentBlock[], source }；
+ * 只拼接 content 里 type === 'text' 的片段。
+ */
+export function extractNodeText(data) {
+  if (!data || !Array.isArray(data.content)) return ''
+  let text = ''
+  for (const block of data.content) {
+    if (block && block.type === 'text' && typeof block.text === 'string') text += block.text
+  }
+  return text
+}
+
+/**
+ * 从 ChatSnapshot 的稳定读取器构建「用户消息定位索引」。
+ * @param chat 形如 { order: readonly string[], nodes: { get(key) => ChatConversationViewNode|undefined } }
+ * @returns [{ key, text }] 按 chat.order 顺序，只含 kind==='user' 且文本非空的节点。
+ */
+export function buildUserMessageIndex(chat) {
+  const list = []
+  if (!chat || !Array.isArray(chat.order) || !chat.nodes || typeof chat.nodes.get !== 'function') return list
+  for (const key of chat.order) {
+    const node = chat.nodes.get(key)
+    if (!node || node.kind !== 'user') continue
+    const text = extractNodeText(node.data)
+    if (text === '') continue
+    list.push({ key, text })
+  }
+  return list
+}

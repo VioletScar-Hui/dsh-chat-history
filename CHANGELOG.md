@@ -5,6 +5,14 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [1.1.0] - 2026-09-02
+
+### Added
+
+- 「消息定位」：会话头部新增 `定位` 按钮，点开后在左侧浮出面板，按会话顺序列出本 session 里所有发送过的用户消息，点击任意一条滚动定位到对应位置并短暂高亮。
+- 走 `conversation.session.header.actions` 槽 + `useSession` 读取 `chat.order` / `chat.nodes`；DOM 定位用 `[data-conversation-scroll]` 容器与 `data-chat-anchor-key` 行（框架无内置 scroll-to API）。
+- 新增纯函数 `extractNodeText` / `buildUserMessageIndex` 及对应单测（共 17 用例）。
+
 ## [Unreleased]
 
 ### Changed

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test'
-import { appendHistory, extractUserTexts, createHistoryStore, MAX_HISTORY } from '../src/client/history.js'
+import { appendHistory, extractUserTexts, extractNodeText, buildUserMessageIndex, createHistoryStore, MAX_HISTORY } from '../src/client/history.js'
 
 describe('appendHistory', () => {
   test('忽略空白字符串', () => {
@@ -94,5 +94,59 @@ describe('createHistoryStore', () => {
     expect(s.pending).toBeNull()
     expect(s.seeded).toBeInstanceOf(Set)
     expect(s.seeded.size).toBe(0)
+  })
+})
+
+describe('extractNodeText', () => {
+  test('从 user 节点 data.content 提取文本', () => {
+    const data = { kind: 'user', content: [{ type: 'text', text: 'hi' }, { type: 'text', text: ' there' }] }
+    expect(extractNodeText(data)).toBe('hi there')
+  })
+
+  test('跳过非 text 片段', () => {
+    const data = { kind: 'user', content: [{ type: 'image', url: 'x' }, { type: 'text', text: 'ok' }] }
+    expect(extractNodeText(data)).toBe('ok')
+  })
+
+  test('无 content / 空内容返回空串', () => {
+    expect(extractNodeText(null)).toBe('')
+    expect(extractNodeText(undefined)).toBe('')
+    expect(extractNodeText({ kind: 'user' })).toBe('')
+    expect(extractNodeText({ kind: 'user', content: [] })).toBe('')
+  })
+})
+
+describe('buildUserMessageIndex', () => {
+  const mkNode = (kind, text) => ({ key: `${kind}-1`, kind, data: { content: [{ type: 'text', text }] } })
+  const mkStore = (nodes) => ({ get: (key) => nodes[key] })
+
+  test('只含 user 节点，按 order 顺序', () => {
+    const store = mkStore({
+      u1: mkNode('user', '第一条'),
+      a1: mkNode('assistant-step', '回复'),
+      u2: mkNode('user', '第二条'),
+    })
+    const chat = { order: ['u1', 'a1', 'u2'], nodes: store }
+    expect(buildUserMessageIndex(chat)).toEqual([
+      { key: 'u1', text: '第一条' },
+      { key: 'u2', text: '第二条' },
+    ])
+  })
+
+  test('跳过空文本与未知节点', () => {
+    const store = mkStore({
+      u1: mkNode('user', ''),
+      u2: { key: 'u2', kind: 'user', data: {} },
+      u3: mkNode('user', '真实'),
+    })
+    const chat = { order: ['u1', 'u2', 'u3'], nodes: store }
+    expect(buildUserMessageIndex(chat)).toEqual([{ key: 'u3', text: '真实' }])
+  })
+
+  test('缺 chat/order/nodes 安全返回空数组', () => {
+    expect(buildUserMessageIndex(null)).toEqual([])
+    expect(buildUserMessageIndex(undefined)).toEqual([])
+    expect(buildUserMessageIndex({})).toEqual([])
+    expect(buildUserMessageIndex({ order: ['k'], nodes: null })).toEqual([])
   })
 })

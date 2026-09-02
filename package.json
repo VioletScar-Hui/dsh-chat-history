@@ -1,6 +1,6 @@
 {
   "name": "@violet/dsh-chat-history",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "给 DSH 聊天输入框加上 CLI 风格的历史记忆：按上下方向键召回之前发送过的内容（纯客户端插件，重启不丢）。",
   "type": "module",
   "main": "lib/index.js",

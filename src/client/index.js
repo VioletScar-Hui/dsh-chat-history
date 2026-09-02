@@ -15,6 +15,7 @@
  */
 import * as React from 'react'
 import { createHistoryStore, appendHistory, extractUserTexts } from './history.js'
+import { SessionNav } from './nav.js'
 
 export const name = 'dsh-chat-history'
 export const inject = ['slots']
@@ -157,6 +158,19 @@ export function apply(ctx) {
       )
     } catch (error) {
       console.error('[dsh-chat-history] conversation.input.left register failed:', error)
+      return () => {}
+    }
+  })
+
+  // 会话头部「定位」按钮：列出本会话发送过的消息，点击跳转到对应位置。
+  ctx.slots.inject('conversation.session.header.actions', () => {
+    try {
+      return ctx.slots.register(
+        { name: 'conversation.session.header.actions', id: 'chat-history-nav', order: 10 },
+        SessionNav
+      )
+    } catch (error) {
+      console.error('[dsh-chat-history] conversation.session.header.actions register failed:', error)
       return () => {}
     }
   })
