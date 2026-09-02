@@ -14,31 +14,21 @@
  *   - 纯内存存储（每会话 seed），连续重复去重、上限 200 条。
  */
 import * as React from 'react'
+import { createHistoryStore, appendHistory, extractUserTexts } from './history.js'
 
 export const name = 'dsh-chat-history'
 export const inject = ['slots']
 
 export function apply(ctx) {
-  const store = { history: [], navIndex: -1, savedDraft: null, pending: null, seeded: new Set() }
+  const store = createHistoryStore()
 
   function pushHistory(text) {
-    const t = text.trim()
-    if (t === '') return
-    const h = store.history
-    if (h.length && h[h.length - 1] === t) return
-    h.push(t)
-    if (h.length > 200) h.splice(0, h.length - 200)
+    appendHistory(store.history, text)
   }
 
   function seedSession(session) {
-    if (!session || !Array.isArray(session.nodes)) return
-    for (const node of session.nodes) {
-      if (!node || node.kind !== 'user' || !Array.isArray(node.content)) continue
-      let text = ''
-      for (const b of node.content) {
-        if (b && b.type === 'text' && typeof b.text === 'string') text += b.text
-      }
-      pushHistory(text)
+    for (const text of extractUserTexts(session ? session.nodes : null)) {
+      appendHistory(store.history, text)
     }
   }
 
