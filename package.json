@@ -50,6 +50,14 @@
     "历史记录"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VioletScar-Hui/dsh-chat-history.git"
+  },
+  "bugs": {
+    "url": "https://github.com/VioletScar-Hui/dsh-chat-history/issues"
+  },
+  "homepage": "https://github.com/VioletScar-Hui/dsh-chat-history#readme",
   "peerDependencies": {
     "react": "^18.2.0"
   }

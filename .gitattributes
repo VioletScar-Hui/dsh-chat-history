@@ -1,0 +1,6 @@
+# 统一行尾，避免跨平台 diff 噪声
+* text=auto eol=lf
+
+# 构建产物与二进制：不做文本 diff
+lib/*.js linguist-generated=true
+docs/*.png binary
