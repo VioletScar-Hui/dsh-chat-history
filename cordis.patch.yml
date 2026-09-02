@@ -1,0 +1,7 @@
+# @violet/dsh-chat-history bundle patch: 向 web profile 插入本插件行。
+# 纯客户端插件：host 半边为空壳，浏览器半边（exports "./client"，
+# 经 /plugins/@violet/dsh-chat-history/client.js 提供）注册
+# conversation.input.left 槽位，实现上下键历史召回。
+- insert:
+    - id: violet-chat-history
+      name: '@violet/dsh-chat-history'
