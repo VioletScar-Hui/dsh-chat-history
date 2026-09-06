@@ -22,7 +22,7 @@
 - **新消息自动记入** —— 发送后自动追加到历史，连续重复去重、上限 200 条
 - **不打扰输入** —— 光标不在行首时不抢 `↑/↓`（不影响编辑中文本）；输入法合成、斜杠命令菜单里也不触发
 - **纯内存** —— 不写磁盘、每会话独立，重启宿主后从会话历史重新预填
-- **消息定位** —— 会话头部点 `定位`，左侧浮出面板按会话顺序列出**你发过的所有消息**，点任意一条直接滚到它在会话里的位置（短暂高亮）
+- **消息定位** —— 会话头部点 `定位`，在会话左侧停靠一条纵向列表（紧挨应用侧边栏），按会话顺序列出**你发过的所有消息**，一条条可浏览、点任意一条直接滚到它在会话里的位置（短暂高亮）
 
 ## 📦 安装
 
@@ -39,7 +39,7 @@ dsh plugin --profile web add github:VioletScar-Hui/dsh-chat-history
 3. 按 `↓`：往后翻；翻到最新时再按 `↓`，还原成你本来在编辑的草稿。
 4. 直接改文字即可退出浏览状态，正常发送。
 
-**消息定位**：点击会话头部右上区域的 `定位` 按钮 → 左侧浮出面板列出本会话发送过的消息 → 点任意一条跳转到对应位置（`Esc` 或点击外部关闭）。
+**消息定位**：点击会话头部右上区域的 `定位` 按钮 → 在会话左侧停靠一条列表（按会话顺序、编号 1/2/3… 列出你发过的消息）→ 点任意一条跳到对应位置（`Esc` 或点击外部关闭）。
 
 ## 🔧 实现
 
@@ -47,7 +47,7 @@ dsh plugin --profile web add github:VioletScar-Hui/dsh-chat-history
 - 键盘监听在 `document` **捕获阶段**，只认 `textarea[data-phase]`（composer 文本域唯一稳定属性）。
 - 历史来源：`ConversationSnapshot.nodes` 里 `kind === 'user'` 节点；发送检测靠 `InputState.phase` 的 `submitting → plain` 迁移。
 - 纯逻辑（trim、连续去重、上限 200、提取用户文本）抽在 [`src/client/history.js`](src/client/history.js)，附单测。
-- 消息定位注册 `conversation.session.header.actions`（list 槽），用 `useSession` 读 `chat.order` / `chat.nodes`，DOM 定位走 `[data-conversation-scroll]` + `data-chat-anchor-key`；面板为 `position:fixed` 悬浮层，不动会话 DOM。
+- 消息定位注册 `conversation.session.header.actions`（list 槽），用 `useSession` 读 `chat.order` / `chat.nodes`，DOM 定位走 `[data-conversation-scroll]` + `data-chat-anchor-key`；面板为 `position:fixed` 停靠栏（左缘=应用侧边栏右缘，上下对齐会话滚动区），不动会话 DOM。
 
 更详细的架构说明见 [`docs/architecture.md`](docs/architecture.md)。
 
