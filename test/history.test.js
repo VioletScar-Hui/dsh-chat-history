@@ -149,4 +149,35 @@ describe('buildUserMessageIndex', () => {
     expect(buildUserMessageIndex({})).toEqual([])
     expect(buildUserMessageIndex({ order: ['k'], nodes: null })).toEqual([])
   })
+
+  test('DSH 0.2.1 Chat target 初始空快照安全返回空数组', () => {
+    const emptyChatSnapshot = {
+      order: [],
+      nodes: { get: () => undefined },
+      navigation: { items: () => [] },
+    }
+    expect(buildUserMessageIndex(emptyChatSnapshot)).toEqual([])
+  })
+
+  test('DSH 0.2.1 Chat target 加载后从 order/nodes 读取用户消息', () => {
+    const store = mkStore({
+      userA: mkNode('user', '从 ChatSnapshot 加载'),
+      assistantA: mkNode('assistant-step', '回复'),
+      userB: mkNode('user', '下一条'),
+    })
+    const loadedChatSnapshot = {
+      order: ['userA', 'assistantA', 'userB'],
+      nodes: store,
+      navigation: {
+        items: () => [
+          { turn: 1, anchorKey: 'userA', prompt: '从 ChatSnapshot 加载', response: '回复' },
+          { turn: 2, anchorKey: 'userB', prompt: '下一条', response: '' },
+        ],
+      },
+    }
+    expect(buildUserMessageIndex(loadedChatSnapshot)).toEqual([
+      { key: 'userA', text: '从 ChatSnapshot 加载' },
+      { key: 'userB', text: '下一条' },
+    ])
+  })
 })

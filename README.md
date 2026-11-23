@@ -47,7 +47,7 @@ dsh plugin --profile web add github:VioletScar-Hui/dsh-chat-history
 - 键盘监听在 `document` **捕获阶段**，只认 `textarea[data-phase]`（composer 文本域唯一稳定属性）。
 - 历史来源：`ConversationSnapshot.nodes` 里 `kind === 'user'` 节点；发送检测靠 `InputState.phase` 的 `submitting → plain` 迁移。
 - 纯逻辑（trim、连续去重、上限 200、提取用户文本）抽在 [`src/client/history.js`](src/client/history.js)，附单测。
-- 消息定位注册 `conversation.session.header.actions`（list 槽），用 `useSession` 读 `chat.order` / `chat.nodes`，DOM 定位走 `[data-conversation-scroll]` + `data-chat-anchor-key`；面板为 `position:fixed` 停靠栏（左缘=应用侧边栏右缘，上下对齐会话滚动区），不动会话 DOM。
+- 消息定位注册 `conversation.session.header.actions`（list 槽），用 DSH 0.2.1 Chat target 的 `useChat` 读 `ChatSnapshot` 的 `order` / `nodes`（0.2.1 起 Chat 从 `SessionSnapshot` 拆为独立的 `ChatSnapshot`，`useSession` 不再暴露 `chat`），DOM 定位走 `[data-conversation-scroll]` + `data-chat-anchor-key`；面板为 `position:fixed` 停靠栏（左缘=应用侧边栏右缘，上下对齐会话滚动区），不动会话 DOM。
 
 更详细的架构说明见 [`docs/architecture.md`](docs/architecture.md)。
 

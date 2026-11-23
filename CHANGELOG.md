@@ -17,6 +17,7 @@
 
 ### Changed
 
+- 适配 DSH 0.2.1：Chat 从 `SessionSnapshot` 拆为独立的 `ChatSnapshot`，消息定位改用 `@deepseek-ai/dsh-client-ui-chat` 注入的 `useChat` 读取快照（原 `useSession` 不再暴露 `chat`）；引擎要求提升到 `>=0.2.1-rc.2`，client inject 增加 `@deepseek-ai/dsh-client-ui-chat`，并补 ChatSnapshot 空快照 / 已加载两条单测。
 - 将历史存储纯逻辑抽取到 `src/client/history.js`（trim、连续去重、上限 200、提取用户文本），便于单测。
 
 ### Added

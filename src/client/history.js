@@ -65,8 +65,9 @@ export function extractNodeText(data) {
 }
 
 /**
- * 从 ChatSnapshot 的稳定读取器构建「用户消息定位索引」。
- * @param chat 形如 { order: readonly string[], nodes: { get(key) => ChatConversationViewNode|undefined } }
+ * 从 DSH 0.2.1 ChatSnapshot 的稳定读取器构建「用户消息定位索引」。
+ * @param chat 形如 { order: readonly string[], nodes: { get(key) => ChatConversationViewNode|undefined } }；
+ *   Chat target 尚未发布时允许为 undefined。
  * @returns [{ key, text }] 按 chat.order 顺序，只含 kind==='user' 且文本非空的节点。
  */
 export function buildUserMessageIndex(chat) {

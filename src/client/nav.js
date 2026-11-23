@@ -7,8 +7,8 @@
  * 对应消息的位置并短暂高亮。
  *
  * 实现要点：
- *   - 数据源用 framework 会话 kit 的 useSession 选择器读 chat.order +
- *     chat.nodes.get(key)，只取 kind === 'user' 节点（data.content 提取文本）。
+ *   - 数据源用 DSH 0.2.1 Chat target 的 useChat 选择器读 order +
+ *     nodes.get(key)，只取 kind === 'user' 节点（data.content 提取文本）。
  *   - 滚动定位走 DOM：会话滚动容器带 [data-conversation-scroll] 属性，每条消息行
  *     带 data-chat-anchor-key="<node.key>"；框架无内置 scroll-to API。
  *   - 面板为 position:fixed 停靠栏：left = 应用侧边栏右缘 + 间距，top/bottom 对齐
@@ -78,17 +78,19 @@ function measureDock(fromEl) {
 
 /**
  * 会话消息定位停靠栏组件。注册进 conversation.session.header.actions（list 槽）。
- * props 由 framework 会话 kit 注入：sessionId / useSession / useInput / inputActions。
+ * props 由 framework 会话 kit 注入：sessionId / useChat / useInput / inputActions。
  */
 export function SessionNav(props) {
-  const useSession = props.useSession
+  // DSH 0.2.1 将 Chat 从 SessionSnapshot 中拆成独立的 ChatSnapshot；
+  // useChat 是 dsh-client-ui-chat 注入的正式会话标准属性。
+  const useChat = props.useChat
   const [open, setOpen] = React.useState(false)
   const [dock, setDock] = React.useState({ left: 280, top: 48, bottom: 48 })
   const rootRef = React.useRef(null)
 
-  const order = useSession((s) => s.chat.order)
-  const nodes = useSession((s) => s.chat.nodes)
-  const items = React.useMemo(() => buildUserMessageIndex({ order, nodes }), [order, nodes])
+  // 官方 EMPTY_CHAT_SNAPSHOT 会提供 order/nodes；helper 也兼容首次绑定期间的 undefined。
+  const chat = useChat((s) => s)
+  const items = React.useMemo(() => buildUserMessageIndex(chat), [chat])
 
   // 打开时测量停靠栏位置。
   React.useEffect(() => {
